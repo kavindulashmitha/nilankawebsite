@@ -178,16 +178,23 @@ function initializePage() {
   const counters = document.querySelectorAll("[data-counter]");
   if (counters.length) {
     const animate = el => {
-      const target = parseInt(el.dataset.counter, 10);
+      const rawValue = el.dataset.counter || "";
       const suffix = el.dataset.suffix || "";
+      const numericValue = Number(rawValue);
+
+      if (!Number.isFinite(numericValue)) {
+        el.textContent = rawValue + suffix;
+        return;
+      }
+
       const duration = 1600;
       const startTime = performance.now();
       const step = now => {
         const progress = Math.min((now - startTime) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.floor(eased * target) + suffix;
+        el.textContent = Math.floor(eased * numericValue) + suffix;
         if (progress < 1) requestAnimationFrame(step);
-        else el.textContent = target + suffix;
+        else el.textContent = numericValue + suffix;
       };
       requestAnimationFrame(step);
     };
